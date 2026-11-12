@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Projeto de estudos básicos de Devops",
   "main": "index.js",
-  "scripts": {
+ "scripts": {
     "start": "node src/app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
