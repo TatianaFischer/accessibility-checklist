@@ -1,0 +1,34 @@
+name: Pipeline de Entrega Contínua (CD)
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  ci-cd-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout do Código
+      uses: actions/checkout@v4
+
+    - name: Configurar Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Instalar Dependências e Executar Testes (CI)
+      run: |
+        npm ci
+        npm test
+
+    - name: Build da Imagem Docker (Containerização)
+      run: docker build -t accessibility-api:${{ github.sha }} .
+
+    - name: Validação do Container (Deploy de Teste em Staging)
+      run: |
+        docker run -d -p 3000:3000 --name test_app accessibility-api:${{ github.sha }}
+        sleep 5
+        curl --fail http://localhost:3000/health || exit 1
+        docker stop test_app && docker rm test_app
